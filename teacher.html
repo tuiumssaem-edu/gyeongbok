@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<title>경복궁 탐험 교사용</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: 한 손으로 보는 교사용 현황판. 위에 요약, 가운데 필터, 아래에 학생별 줄. */
+:root{
+  --bg:#EDF0EC; --surface:#FFFFFF; --surface2:#E2E7E2; --fg:#14213D; --muted:#56627A; --line:#CBD3CC;
+  --red:#C8372D; --blue:#1F5FA8; --green:#2A8467; --gold:#D9A21B; --on-red:#FFFFFF; --shadow:0 2px 10px rgba(20,33,61,.12);
+  --display:"Black Han Sans","Noto Sans KR",sans-serif; --body:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1730; --surface:#18254A; --surface2:#22315C; --fg:#EEF1F8; --muted:#A5B0CB; --line:#2E3E6E;
+  --red:#EC5B4F; --blue:#5B9BE6; --green:#4DBB96; --gold:#F0BC3A; --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1730; --surface:#18254A; --surface2:#22315C; --fg:#EEF1F8; --muted:#A5B0CB; --line:#2E3E6E;
+  --red:#EC5B4F; --blue:#5B9BE6; --green:#4DBB96; --gold:#F0BC3A; --shadow:0 2px 12px rgba(0,0,0,.4); color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;margin:0;padding-inline:16px;min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+h1,h2{margin:0;font-weight:400;font-family:var(--display)}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin-inline:auto;padding-block:max(10px,env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
+.dan{height:8px;border-radius:2px;background:linear-gradient(90deg,var(--red) 0 25%,var(--gold) 25% 50%,var(--green) 50% 75%,var(--blue) 75% 100%)}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted);font-weight:700}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;padding-block:10px 12px}
+.head h1{font-size:28px;line-height:1.15}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 16px;border-radius:12px;border:0;background:var(--red);color:var(--on-red);font-weight:700}
+.btn.ghost{background:var(--surface);border:2px solid var(--line);color:var(--fg)}
+.btn.sm{min-height:38px;font-size:14px;padding:0 12px}
+.card{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;font-size:13px}
+.field input[type=password],.field input[type=search],.field input[type=text]{font-size:17px;padding:12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--fg);width:100%}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--muted)}
+.msg{margin:0;font-size:13px;color:var(--muted)}
+.err{color:var(--red);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow)}
+.stat b{display:block;font-family:var(--display);font-size:28px;font-weight:400;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted)}
+.tools{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{min-height:38px;padding:0 14px;border-radius:99px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.row2{display:flex;gap:8px}
+.row2>*{min-width:0}
+.row2 input{flex:1;border:2px solid var(--line);border-radius:10px;background:var(--surface);padding:0 12px;min-height:44px;-webkit-appearance:none;appearance:none}
+.row2 select{flex:none;border:2px solid var(--line);border-radius:10px;background:var(--surface);padding:0 8px;min-height:44px}
+.list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.st{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.st>button{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left;border:0;background:transparent;padding:12px}
+.top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.nm{font-weight:700;font-size:16px;overflow-wrap:anywhere;min-width:0}
+.cnt{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums;flex:none}
+.cnt small{font-family:var(--body);font-size:12px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+.st.full .bar i{background:var(--gold)}
+.dots{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.dots i{aspect-ratio:1;border-radius:50%;background:var(--surface2);display:block}
+.dots i.on{background:var(--green)}
+.meta{font-size:12px;color:var(--muted)}
+.detail{padding:0 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.detail div{display:flex;gap:6px;font-size:13px;align-items:baseline;min-width:0}
+.detail b{flex:none;width:20px;height:20px;border-radius:50%;background:var(--surface2);color:var(--muted);display:grid;place-items:center;font-size:11px}
+.detail .on b{background:var(--green);color:#fff}
+.detail .on{font-weight:700}
+.empty{padding:28px 12px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="dan"></div>
+  <div class="head"><div><div class="eyebrow">10월 현장체험학습</div><h1>탐험 현황판</h1></div><button class="btn ghost sm" id="rf">새로고침</button></div>
+
+  <section id="fail" class="card" hidden>
+    <p style="margin:0"><b>현황을 불러오지 못했어요.</b></p>
+    <p class="msg" style="margin-top:6px">인터넷 연결과 config.js의 주소 설정을 확인한 뒤 다시 눌러 주세요.</p>
+    <button class="btn" id="retry" style="margin-top:10px">다시 불러오기</button>
+  </section>
+
+  <section id="setup" class="card" hidden>
+    <p style="margin:0"><b>아직 연결되지 않았어요.</b></p>
+    <p class="msg" style="margin-top:6px">config.js 파일에 Apps Script 웹 앱 주소를 넣고 다시 올려 주세요. 방법은 사용 안내 파일에 있습니다.</p>
+  </section>
+
+  <section id="dash" hidden>
+    <div class="stats">
+      <div class="stat"><b id="s1">0</b><span>참여</span></div>
+      <div class="stat"><b id="s2">0</b><span>12개 완료</span></div>
+      <div class="stat"><b id="s3">0</b><span>아직 0개</span></div>
+    </div>
+    <div class="tools">
+      <div class="chips" id="chips">
+        <button class="chip" data-f="all" aria-pressed="true">전체</button>
+        <button class="chip" data-f="go" aria-pressed="false">진행 중</button>
+        <button class="chip" data-f="done" aria-pressed="false">완료</button>
+        <button class="chip" data-f="zero" aria-pressed="false">시작 전</button>
+      </div>
+      <div class="row2">
+        <input id="q" type="search" placeholder="이름 검색" aria-label="이름 검색">
+        <select id="sort" aria-label="정렬">
+          <option value="recent">최근 전송순</option>
+          <option value="name">이름순</option>
+          <option value="low">적게 한 순</option>
+          <option value="high">많이 한 순</option>
+        </select>
+      </div>
+      <div class="row2" style="align-items:center;justify-content:space-between">
+        <span class="msg" id="upd"></span>
+      </div>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+</div>
+
+<script src="config.js"></script>
+<script>
+const CFG=window.GBG_CONFIG||{};
+const ENDPOINT=(CFG.endpoint||'').trim();
+const T=['해태 꼬리 터치 샷','광화문 봉황과 나','영제교 메롱 석상','일월오봉도 앞에서','천자고를 찾아라','소주방 우물터','꽃담 최애 그림','왕의 산책','곤녕합 앞에서','집옥재 독서 인증','교태전 화계','만수무강 굴뚝'];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let students=[],filter='all',open={},timer=null,loading=false;
+
+
+/* JSONP: 구글 서버 응답을 다른 사이트에서 읽기 위한 방식 */
+function fetchList(){
+  return new Promise((res,rej)=>{
+    const cb='gbg_'+Date.now()+'_'+Math.floor(Math.random()*1e4);
+    const s=document.createElement('script');
+    const done=()=>{clearTimeout(tm);delete window[cb];s.remove()};
+    const tm=setTimeout(()=>{done();rej(new Error('timeout'))},15000);
+    window[cb]=d=>{done();res(d)};
+    s.onerror=()=>{done();rej(new Error('net'))};
+    s.src=ENDPOINT+(ENDPOINT.includes('?')?'&':'?')+'action=list&callback='+cb;
+    document.head.appendChild(s);
+  });
+}
+
+function show(which){['fail','setup','dash'].forEach(k=>$('#'+k).hidden=k!==which);$('#rf').hidden=which==='setup'}
+
+async function load(manual){
+  if(loading)return;loading=true;
+  if(manual)$('#rf').textContent='불러오는 중…';
+  try{
+    const d=await fetchList();
+    if(!d||!d.ok)throw new Error('bad');
+    students=d.students||[];
+    show('dash');render();
+    const n=new Date();$('#upd').textContent='마지막 확인 '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+    if(!timer)timer=setInterval(()=>{if(document.visibilityState==='visible')load(false)},30000);
+  }catch(e){
+    if($('#dash').hidden)show('fail');
+    else $('#upd').textContent='불러오지 못했어요. 잠시 뒤 다시 눌러 주세요.';
+  }finally{loading=false;$('#rf').textContent='새로고침'}
+}
+
+function render(){
+  const n=students.length,full=students.filter(s=>s.count>=12).length,zero=students.filter(s=>s.count===0).length;
+  $('#s1').textContent=n;$('#s2').textContent=full;$('#s3').textContent=zero;
+  const q=$('#q').value.trim();
+  let a=students.filter(s=>(!q||s.name.includes(q))&&(filter==='all'||(filter==='done'&&s.count>=12)||(filter==='zero'&&s.count===0)||(filter==='go'&&s.count>0&&s.count<12)));
+  const so=$('#sort').value;
+  a=a.slice().sort((x,y)=>so==='name'?x.name.localeCompare(y.name,'ko'):so==='low'?x.count-y.count||x.name.localeCompare(y.name,'ko'):so==='high'?y.count-x.count||x.name.localeCompare(y.name,'ko'):String(y.last).localeCompare(String(x.last)));
+  const L=$('#list');
+  if(!n){L.innerHTML='<div class="empty">아직 전송한 학생이 없어요.<br>학생이 이름을 입력하면 여기에 나타납니다.</div>';return}
+  if(!a.length){L.innerHTML='<div class="empty">조건에 맞는 학생이 없어요.</div>';return}
+  L.innerHTML=a.map(s=>{
+    const set=new Set(s.done),o=!!open[s.name];
+    return `<div class="st ${s.count>=12?'full':''}"><button data-n="${esc(s.name)}" aria-expanded="${o}">
+      <div class="top"><span class="nm">${esc(s.name)}</span><span class="cnt">${s.count}<small> / 12</small></span></div>
+      <div class="bar"><i style="width:${Math.round(s.count/12*100)}%"></i></div>
+      <div class="dots">${T.map((_,i)=>`<i class="${set.has(i+1)?'on':''}"></i>`).join('')}</div>
+      <span class="meta">${s.last?'마지막 전송 '+esc(s.last):'전송 기록 없음'}</span></button>
+      ${o?`<div class="detail">${T.map((t,i)=>`<div class="${set.has(i+1)?'on':''}"><b>${i+1}</b><span>${esc(t)}</span></div>`).join('')}</div>`:''}</div>`}).join('');
+  L.querySelectorAll('.st>button').forEach(b=>b.onclick=()=>{open[b.dataset.n]=!open[b.dataset.n];render()});
+}
+
+$('#rf').onclick=()=>load(true);$('#retry').onclick=()=>load(true);
+$('#q').oninput=render;$('#sort').onchange=render;
+document.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{filter=c.dataset.f;document.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===c));render()});
+
+if(!ENDPOINT)show('setup');
+else load(true);
+</script>
+</body>
+</html>
